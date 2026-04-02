@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The East Coast Edit — Lookbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #1B2A4A; --burgundy: #8B1A1A; --hunter: #2C3E2D;
+    --cognac: #3D3028; --camel: #C8B89A; --cream: #F5F0E8;
+    --slate: #6B7B6B; --ink: #1a1814; --muted: #7a7570;
+    --border: rgba(60,48,40,0.13); --bg: #FAF7F2;
+  }
+  html, body { height: 100%; background: var(--bg); font-family: 'Jost', sans-serif; color: var(--ink); overflow: hidden; }
+
+  .book { display: flex; flex-direction: column; height: 100vh; max-width: 920px; margin: 0 auto; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 36px 13px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
+  .book-title { font-family: 'Cormorant Garamond', serif; font-size: 13px; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+  .page-counter { font-size: 11px; letter-spacing: 0.12em; color: var(--muted); font-weight: 300; }
+
+  .pages { flex: 1; overflow: hidden; position: relative; }
+  .page { position: absolute; inset: 0; overflow-y: auto; padding: 36px 40px 90px; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
+  .page.active { opacity: 1; pointer-events: all; }
+  .page::-webkit-scrollbar { width: 3px; }
+  .page::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 36px 18px; border-top: 0.5px solid var(--border); flex-shrink: 0; background: var(--bg); }
+  .nav-btn { background: none; border: 0.5px solid var(--border); color: var(--ink); font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 22px; cursor: pointer; border-radius: 2px; transition: all 0.2s; }
+  .nav-btn:hover:not(:disabled) { background: var(--cognac); color: var(--cream); border-color: var(--cognac); }
+  .nav-btn:disabled { opacity: 0.2; cursor: default; }
+  .dots { display: flex; gap: 7px; align-items: center; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: transparent; border: 0.5px solid var(--camel); cursor: pointer; transition: all 0.2s; }
+  .dot.active { background: var(--cognac); border-color: var(--cognac); }
+
+  /* TYPOGRAPHY */
+  .chapter-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--camel); margin-bottom: 5px; }
+  .page-heading { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 300; line-height: 1.1; color: var(--navy); margin-bottom: 5px; }
+  .page-subheading { font-size: 13px; color: var(--muted); font-weight: 300; margin-bottom: 28px; }
+  .label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .val { font-size: 13.5px; color: var(--ink); line-height: 1.7; margin-bottom: 12px; }
+  .val:last-child { margin-bottom: 0; }
+  .divider { border: none; border-top: 0.5px solid var(--border); margin: 13px 0; }
+
+  /* LAYOUT */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 13px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 13px; margin-bottom: 13px; }
+  .full { grid-column: 1 / -1; }
+
+  /* CARDS */
+  .card { background: #fff; border: 0.5px solid var(--border); border-radius: 4px; padding: 18px 20px; }
+  .card-dark { background: var(--navy); border-radius: 4px; padding: 20px 24px; }
+  .card-warm { background: var(--cream); border: 0.5px solid var(--border); border-radius: 4px; padding: 18px 20px; }
+
+  /* PALETTE */
+  .palette { display: flex; border-radius: 4px; overflow: hidden; height: 82px; margin-bottom: 13px; }
+  .sw { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: 7px 8px; }
+  .sw-name { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .sw-role { font-size: 9px; opacity: 0.65; margin-top: 1px; }
+
+  /* PIECE */
+  .piece { background: #fff; border: 0.5px solid var(--border); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; }
+  .pdot { width: 24px; height: 24px; border-radius: 50%; border: 0.5px solid rgba(0,0,0,0.08); margin-bottom: 9px; }
+  .piece-name { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 5px; }
+  .piece-detail { font-size: 12px; color: var(--muted); line-height: 1.55; flex: 1; }
+  .piece-where { font-size: 10px; color: var(--camel); margin-top: 9px; border-top: 0.5px solid var(--border); padding-top: 8px; }
+  .badge { display: inline-block; font-size: 9px; padding: 2px 8px; border-radius: 10px; margin-bottom: 7px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .b1 { background: #E8EEF5; color: var(--navy); }
+  .b2 { background: var(--cream); color: var(--muted); }
+
+  /* RULES */
+  .rule { display: flex; gap: 13px; margin-bottom: 13px; }
+  .rule:last-child { margin-bottom: 0; }
+  .rn { font-size: 10px; color: var(--camel); min-width: 22px; padding-top: 3px; }
+  .rt { font-size: 13.5px; color: var(--ink); line-height: 1.65; }
+  .rs { display: block; font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  /* QUOTE */
+  .quote { border-left: 2px solid var(--camel); padding: 11px 16px; margin: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 17px; font-style: italic; color: var(--navy); line-height: 1.6; }
+
+  /* TIER */
+  .tier { border: 0.5px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 13px; }
+  .tier-hdr { padding: 12px 18px; display: flex; align-items: baseline; gap: 12px; border-bottom: 0.5px solid var(--border); }
+  .tier-hdr.dark { background: var(--navy); border-bottom-color: #2A3A5A; }
+  .tier-title { font-size: 13.5px; font-weight: 500; color: var(--ink); }
+  .tier-hdr.dark .tier-title { color: #C8D8E8; }
+  .tier-sub { font-size: 11px; color: var(--muted); }
+  .tier-hdr.dark .tier-sub { color: #6A88A8; }
+  .tier-body { display: grid; grid-template-columns: 1fr 1fr 1fr; background: #fff; }
+  .tier-col { padding: 14px 16px; border-right: 0.5px solid var(--border); }
+  .tier-col:last-child { border-right: none; }
+  .sn { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+  .sd { font-size: 12px; color: var(--muted); line-height: 1.55; margin-bottom: 10px; }
+  .sd:last-child { margin-bottom: 0; }
+
+  /* INVEST */
+  .invest { border: 0.5px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 13px; }
+  .invest-hdr { padding: 12px 18px; background: var(--navy); border-bottom: 0.5px solid #2A3A5A; }
+  .invest-hdr h3 { font-size: 13px; font-weight: 400; color: #C8D8E8; margin-bottom: 2px; }
+  .invest-hdr p { font-size: 11px; color: #6A88A8; }
+  .invest-body { display: grid; grid-template-columns: 1fr 1fr 1fr; background: #fff; }
+  .ic { padding: 13px 15px; border-right: 0.5px solid var(--border); }
+  .ic:last-child { border-right: none; }
+  .ic-name { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+  .ic-detail { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+  /* VS */
+  .vs { display: grid; grid-template-columns: 1fr 1fr; border: 0.5px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 13px; }
+  .vs-col { padding: 16px 18px; }
+  .vs-col:first-child { border-right: 0.5px solid var(--border); }
+  .vs-title { font-size: 10px; font-weight: 500; color: var(--muted); margin-bottom: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .vs-item { font-size: 13px; color: var(--ink); margin-bottom: 8px; padding-left: 10px; border-left: 1.5px solid var(--border); line-height: 1.5; }
+
+  /* ISLAND */
+  .isl { border-radius: 4px; padding: 16px 20px; }
+  .isl.ack { background: var(--navy); }
+  .isl.mv { background: var(--hunter); }
+  .isl-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; margin-bottom: 5px; }
+  .ack .isl-title { color: #C8D8E8; }
+  .mv .isl-title { color: #B8CEB8; }
+  .ack .isl-sub { font-size: 12px; color: #6A88A8; }
+  .mv .isl-sub { font-size: 12px; color: #5A8A6A; }
+
+  /* TAG */
+  .tag { display: inline-block; font-size: 10px; padding: 3px 9px; border-radius: 10px; margin: 3px 3px 3px 0; background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.5); border: 0.5px solid rgba(255,255,255,0.1); letter-spacing: 0.04em; }
+
+  /* COVER */
+  .cover { display: flex; flex-direction: column; justify-content: center; min-height: calc(100vh - 170px); padding: 0 4px; }
+  .cover-eyebrow { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--camel); margin-bottom: 16px; }
+  .cover-title { font-family: 'Cormorant Garamond', serif; font-size: 64px; font-weight: 300; line-height: 1.02; color: var(--navy); margin-bottom: 18px; }
+  .cover-title em { font-style: italic; color: var(--cognac); }
+  .cover-desc { font-size: 14px; color: var(--muted); line-height: 1.8; max-width: 500px; margin-bottom: 36px; font-weight: 300; }
+  .cover-line { width: 44px; height: 1px; background: var(--camel); margin-bottom: 28px; }
+  .toc { display: flex; flex-direction: column; gap: 9px; }
+  .toc-item { display: flex; align-items: center; gap: 13px; font-size: 12px; color: var(--muted); letter-spacing: 0.06em; cursor: pointer; transition: color 0.2s; }
+  .toc-item:hover { color: var(--navy); }
+  .toc-num { font-size: 10px; color: var(--camel); min-width: 20px; }
+  .toc-name { text-transform: uppercase; letter-spacing: 0.1em; }
+
+  .cdots { display: flex; gap: 5px; margin-bottom: 10px; }
+  .cdot { width: 14px; height: 14px; border-radius: 50%; border: 0.5px solid rgba(0,0,0,0.08); }
+</style>
+</head>
+<body>
+<div class="book">
+
+  <div class="topbar">
+    <span class="book-title">The East Coast Edit &nbsp;·&nbsp; A Personal Style Guide</span>
+    <span class="page-counter" id="counter">1 / 10</span>
+  </div>
+
+  <div class="pages">
+
+    <!-- PAGE 1: COVER -->
+    <div class="page active" id="p0">
+      <div class="cover">
+        <p class="cover-eyebrow">A personal style guide</p>
+        <h1 class="cover-title">The East<br>Coast <em>Edit</em></h1>
+        <p class="cover-desc">Old money. Institutional belonging. Warm wool and structured leather. Georgetown townhouses, Nantucket weekends, and the wardrobe that makes it all cohere — translated for a life in San Francisco.</p>
+        <div class="cover-line"></div>
+        <div class="toc">
+          <div class="toc-item" onclick="goTo(1)"><span class="toc-num">01</span><span class="toc-name">The Aesthetic</span></div>
+          <div class="toc-item" onclick="goTo(2)"><span class="toc-num">02</span><span class="toc-name">The Palette</span></div>
+          <div class="toc-item" onclick="goTo(3)"><span class="toc-num">03</span><span class="toc-name">The Wardrobe</span></div>
+          <div class="toc-item" onclick="goTo(4)"><span class="toc-num">04</span><span class="toc-name">Where to Shop</span></div>
+          <div class="toc-item" onclick="goTo(5)"><span class="toc-num">05</span><span class="toc-name">Shoes</span></div>
+          <div class="toc-item" onclick="goTo(6)"><span class="toc-num">06</span><span class="toc-name">Jewelry & Accessories</span></div>
+          <div class="toc-item" onclick="goTo(7)"><span class="toc-num">07</span><span class="toc-name">The Bag</span></div>
+          <div class="toc-item" onclick="goTo(8)"><span class="toc-num">08</span><span class="toc-name">The Summer Edit</span></div>
+          <div class="toc-item" onclick="goTo(9)"><span class="toc-num">09</span><span class="toc-name">The Weekend</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 2: AESTHETIC -->
+    <div class="page" id="p1">
+      <p class="chapter-label">Chapter 01</p>
+      <h2 class="page-heading">The Aesthetic</h2>
+      <p class="page-subheading">DC / East Coast luxury — institutional power dressed in good wool</p>
+
+      <div class="card-dark full" style="margin-bottom:13px; border-radius:4px;">
+        <p style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#C8D8E8;margin-bottom:8px;">Georgetown. Beacon Hill. The Upper East Side.</p>
+        <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:14px;">Dark hardwood. Oil portraits. Rooms that seat fourteen. A wardrobe assembled over decades rather than purchased in a season.</p>
+        <span class="tag">old money</span><span class="tag">ceremonial</span><span class="tag">structured</span><span class="tag">historically rooted</span><span class="tag">ivy-adjacent</span><span class="tag">formal at rest</span>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <p class="label">the social calendar</p>
+          <p class="val">Kennedy Center galas. Think tank dinners. Embassy receptions. A standing reservation where the maître d' knows your name and your usual.</p>
+          <div class="divider"></div>
+          <p class="label">the weekend</p>
+          <p class="val">The Vineyard or Nantucket in summer. Skiing in Vermont, not Aspen. Sunday dinners that are actually formal.</p>
+        </div>
+        <div class="card">
+          <p class="label">food & drink</p>
+          <p class="val">Scotch or a proper martini — never a cocktail with a garnish situation. Oysters as punctuation. A wine cellar, not a wine rack.</p>
+          <div class="divider"></div>
+          <p class="label">the club</p>
+          <p class="val">Metropolitan Club. Cosmos Club. A golf club with a waiting list measured in decades.</p>
+        </div>
+        <div class="card full">
+          <p class="label">the deeper code</p>
+          <div class="quote">"This aesthetic is about institutional belonging — the signal isn't wealth, it's membership. Money is assumed and never mentioned. Newness is suspicious. The highest compliment is that something looks like it's been in the family."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 3: PALETTE -->
+    <div class="page" id="p2">
+      <p class="chapter-label">Chapter 02</p>
+      <h2 class="page-heading">The Palette</h2>
+      <p class="page-subheading">Seven colors. Everything works together. Nothing is ever a mistake.</p>
+
+      <div class="palette">
+        <div class="sw" style="background:#1B2A4A;"><span class="sw-name" style="color:#8AAAC8;">navy</span><span class="sw-role" style="color:#6A88A8;">anchor</span></div>
+        <div class="sw" style="background:#8B1A1A;"><span class="sw-name" style="color:#D4A0A0;">burgundy</span><span class="sw-role" style="color:#B08080;">depth</span></div>
+        <div class="sw" style="background:#2C3E2D;"><span class="sw-name" style="color:#8AAB8C;">hunter</span><span class="sw-role" style="color:#6A8B6C;">accent</span></div>
+        <div class="sw" style="background:#3D3028;"><span class="sw-name" style="color:#B09880;">cognac</span><span class="sw-role" style="color:#907860;">warmth</span></div>
+        <div class="sw" style="background:#C8B89A;"><span class="sw-name" style="color:#4A3C2C;">camel</span><span class="sw-role" style="color:#6A5848;">bridge</span></div>
+        <div class="sw" style="background:#F5F0E8;"><span class="sw-name" style="color:#8A7D6B;">cream</span><span class="sw-role" style="color:#9A8D7B;">ground</span></div>
+        <div class="sw" style="background:#6B7B6B;"><span class="sw-name" style="color:#D0DDD0;">slate</span><span class="sw-role" style="color:#B0BDB0;">neutral</span></div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <p class="label">the anchor — navy</p>
+          <p class="val">Every outfit begins or ends here. The blazer, the sheath dress, the turtleneck. Navy does the structural work of black without the harshness.</p>
+          <div class="divider"></div>
+          <p class="label">the warmth — cognac & camel</p>
+          <p class="val">These two together are the whole palette in miniature. Cognac leather against a camel coat is one of the best combinations in this wardrobe.</p>
+        </div>
+        <div class="card">
+          <p class="label">the accent — burgundy & hunter</p>
+          <p class="val">Used sparingly, one at a time. A burgundy turtleneck under the camel coat. A hunter green sheath dress. Never both together.</p>
+          <div class="divider"></div>
+          <p class="label">the ground — cream</p>
+          <p class="val">Silk blouses, linings. Cream rather than white — white is too clean, too new. Cream has been somewhere.</p>
+        </div>
+        <div class="card-warm full">
+          <p class="label">the SF advantage</p>
+          <p class="val">This palette was made for cool, grey light. These colors were designed for overcast skies, fog, the quality of light on a Georgetown street in November. San Francisco gives you exactly that. The camel coat and cashmere turtleneck aren't aspirational here — you'll wear them constantly.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 4: WARDROBE -->
+    <div class="page" id="p3">
+      <p class="chapter-label">Chapter 03</p>
+      <h2 class="page-heading">The Wardrobe</h2>
+      <p class="page-subheading">Six foundational pieces. Everything else is secondary.</p>
+
+      <div class="g3">
+        <div class="piece"><div class="pdot" style="background:#1B2A4A;"></div><p class="piece-name">Navy blazer</p><p class="piece-detail">Structured, lined, single-breasted. Gold buttons if you're feeling it. Wears over everything — trousers, a dress, dark denim if casual.</p><p class="piece-where">The Row · Ralph Lauren Purple Label · J.Crew Italian wool</p></div>
+        <div class="piece"><div class="pdot" style="background:#C8B89A;"></div><p class="piece-name">Camel wool trench</p><p class="piece-detail">The cornerstone piece — already acquired. Wool trench silhouette is if anything more classic than a straight coat. The lighter neutral that goes over everything and carries the whole aesthetic in one garment.</p><p class="piece-where">Aritzia (yours) ✓</p></div>
+        <div class="piece"><div class="pdot" style="background:#F5F0E8; border:0.5px solid #ddd;"></div><p class="piece-name">Cream silk blouse</p><p class="piece-detail">Loose but structured. Tucks into trousers. Never a synthetic. The fabric is what makes it work — it has to move correctly.</p><p class="piece-where">Sézane · Toteme · vintage silk</p></div>
+        <div class="piece"><div class="pdot" style="background:#3D3028;"></div><p class="piece-name">Wool trousers</p><p class="piece-detail">Wide leg, high waist. Size up for the hip, have the waist taken in. Cognac or charcoal. These replace jeans in this wardrobe.</p><p class="piece-where">Toteme · J.Crew Italian wool · Banana Republic heritage</p></div>
+        <div class="piece"><div class="pdot" style="background:#8B1A1A;"></div><p class="piece-name">Cashmere turtleneck</p><p class="piece-detail">Burgundy, navy, or camel. Don't size down — the volume on top balanced by a tailored trouser is the move. SF weather makes this your most-worn piece.</p><p class="piece-where">Loro Piana (resale) · Toteme · Everlane cashmere</p></div>
+        <div class="piece"><div class="pdot" style="background:#2C3E2D;"></div><p class="piece-name">Sheath dress</p><p class="piece-detail">Hunter green or navy. Midi length especially for your height. Worn with low heels and a blazer over — the dressed-up version of the whole look.</p><p class="piece-where">Carolina Herrera · Sézane · & Other Stories</p></div>
+      </div>
+
+      <div class="card" style="margin-bottom:13px;">
+        <p class="label">the body note</p>
+        <p class="val">Tall and lanky with some thickness is exactly the body this wardrobe was designed for. Wide-leg trousers and a long coat need height to carry them. Size up for shoulder fit on blazers and coats — shoulders cannot be meaningfully altered, everything else can. Bring the Aritzia coat to a tailor; having the waist and sleeves adjusted will make it read two tiers higher than it cost.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:13px;">
+        <p class="label">your coats — already covered</p>
+        <p class="val">The <strong style="font-weight:500;">camel wool trench</strong> is your cornerstone — the lighter neutral that carries the whole aesthetic in one garment. The <strong style="font-weight:500;">gray herringbone wool trench</strong> is your second coat — herringbone is one of the most establishment fabrics in this world, and gray bridges the warm palette without fighting it. Two coats, two moods, every situation covered. Over a burgundy turtleneck and cognac boots the gray herringbone is very good.</p>
+      </div>
+
+      <div class="card">
+        <p class="label">the rules</p>
+        <div class="rule"><span class="rn">01</span><span class="rt">Fabric before silhouette. Wool, cashmere, silk, linen — non-negotiable. <span class="rs">This is where the money actually goes.</span></span></div>
+        <div class="rule"><span class="rn">02</span><span class="rt">Nothing trendy. If it appeared in a trend report this year, it's wrong. <span class="rs">Everything should look like it could be five years old or fifty.</span></span></div>
+        <div class="rule"><span class="rn">03</span><span class="rt">The palette polices itself. When everything lives in the same color family, getting dressed becomes effortless. <span class="rs">Which is the whole point.</span></span></div>
+      </div>
+    </div>
+
+    <!-- PAGE 5: SHOPPING -->
+    <div class="page" id="p4">
+      <p class="chapter-label">Chapter 04</p>
+      <h2 class="page-heading">Where to Shop</h2>
+      <p class="page-subheading">Investment tier, mid tier, and the resale angle.</p>
+
+      <div class="tier">
+        <div class="tier-hdr dark"><span class="tier-title">Investment tier</span><span class="tier-sub">Buy once, keep forever</span></div>
+        <div class="tier-body">
+          <div class="tier-col"><p class="sn">The Row</p><p class="sd">The closest thing to a perfect wardrobe brand. Obsessive about fabric and fit. Expensive but genuinely timeless.</p><p class="sn">Gabriela Hearst</p><p class="sd">Sustainable wool and cashmere. Structured but not stiff. Suits and coats especially.</p></div>
+          <div class="tier-col"><p class="sn">Ralph Lauren Purple Label</p><p class="sd">Purple Label only — not the main line. Impeccable wool suits and blazers. The most directly Selina brand in existence.</p><p class="sn">Loro Piana</p><p class="sd">For cashmere and fine wool — turtlenecks, loafers. The fabric quality is unmatched. No logos, ever.</p></div>
+          <div class="tier-col"><p class="sn">Carolina Herrera</p><p class="sd">For event dressing and sheath dresses. Structured, architectural, correct.</p><p class="sn">Hermès</p><p class="sd">You have the scarf. If adding anything else — leather goods only. Nothing with the logo as primary element.</p></div>
+        </div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-hdr"><span class="tier-title">Mid tier — the smart layer</span><span class="tier-sub">Good fabric, doesn't compromise the rules</span></div>
+        <div class="tier-body">
+          <div class="tier-col"><p class="sn">Toteme</p><p class="sd">Swedish. Clean, architectural, exactly the right palette. Probably the best mid-tier brand for this wardrobe.</p><p class="sn">Sézane</p><p class="sd">French, good fabric discipline. Silk blouses and knitwear especially.</p></div>
+          <div class="tier-col"><p class="sn">J.Crew (selectively)</p><p class="sd">The Italian wool blazers and trousers. Ignore anything with embellishment or trend-chasing.</p><p class="sn">Cos</p><p class="sd">Hit or miss but the hits are real. Always check fabric content before buying.</p></div>
+          <div class="tier-col"><p class="sn">Banana Republic heritage</p><p class="sd">Heritage line only. Solid basics for cream blouses and simple knits.</p><p class="sn">& Other Stories</p><p class="sd">Better than its parentage suggests. Good loafers and leather bags at accessible prices.</p></div>
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <p class="label">the resale angle</p>
+          <p class="val">The Row, Loro Piana, Purple Label on The RealReal or Vestiaire Collective. A ten-year-old Loro Piana cashmere turtleneck in good condition beats a new mid-tier one. Resale means investment brands at mid-tier prices.</p>
+        </div>
+        <div class="card">
+          <p class="label">SF specifically</p>
+          <p class="val">Wilkes Bashford on Sutter Street is the most Selina-adjacent store in the city. Proper tailoring, good brands, old school service. Worth going in person.</p>
+          <div class="divider"></div>
+          <p class="label">avoid</p>
+          <p class="val">Theory (reads corporate), Ralph Lauren main line (too logo-forward), Zara (silhouette right, fabric fails immediately).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 6: SHOES -->
+    <div class="page" id="p5">
+      <p class="chapter-label">Chapter 05</p>
+      <h2 class="page-heading">Shoes</h2>
+      <p class="page-subheading">Low, structured, leather. The vocabulary is small and specific.</p>
+
+      <div class="g3">
+        <div class="piece"><span class="badge b1">start here</span><p class="piece-name">The loafer</p><div class="cdots"><div class="cdot" style="background:#3D3028;"></div><div class="cdot" style="background:#1a1a1a;"></div><div class="cdot" style="background:#C8B89A;"></div></div><p class="piece-detail">The single most important shoe. Wears with trousers, midi skirts, under a coat. The Gucci horsebit is canonical — the logo is subtle enough to be correct here.</p><p class="piece-where">Gucci horsebit · Reformation · & Other Stories</p></div>
+        <div class="piece"><span class="badge b1">start here</span><p class="piece-name">Block heel pump</p><div class="cdots"><div class="cdot" style="background:#1a1a1a;"></div><div class="cdot" style="background:#3D3028;"></div><div class="cdot" style="background:#8B1A1A;"></div></div><p class="piece-detail">Two to three inches, square or rounded toe, leather. Never a stiletto. The block heel is what makes it workable on SF hills without compromising the look.</p><p class="piece-where">Margaux · Sarah Flint · Sézane</p></div>
+        <div class="piece"><span class="badge b1">start here</span><p class="piece-name">Knee boot</p><div class="cdots"><div class="cdot" style="background:#1a1a1a;"></div><div class="cdot" style="background:#3D3028;"></div></div><p class="piece-detail">Flat or very low heel, leather. The SF winter shoe. Cognac with the camel coat is one of the best combinations in this wardrobe.</p><p class="piece-where">Toteme · Frye · Thursday Boot Co · vintage</p></div>
+        <div class="piece"><span class="badge b2">add later</span><p class="piece-name">Ballet flat</p><p class="piece-detail">A comfort choice, not a style one. Simple leather, no embellishment. Still impeccable.</p><p class="piece-where">Repetto · Margaux · Madewell</p></div>
+        <div class="piece"><span class="badge b2">add later</span><p class="piece-name">Leather sneaker</p><p class="piece-detail">The one SF concession. Clean white or tan leather, minimal branding. Off-duty only — never with the blazer or coat.</p><p class="piece-where">Common Projects · Veja · Koio</p></div>
+        <div class="piece"><span class="badge b2">add later</span><p class="piece-name">Driving loafer</p><p class="piece-detail">Rubber pebble sole. Weekend errands, farmers market, the Tiburon ferry. More casual than the regular loafer.</p><p class="piece-where">Tod's · Quoddy · Bass Weejuns</p></div>
+      </div>
+
+      <div class="card">
+        <p class="label">the height note</p>
+        <p class="val">Your height means you don't need the heel. Flat loafers and knee boots are your power shoes. The camel coat at your height in flat cognac boots is already the whole look. Cognac first, black second — that's the entire shoe palette. Find a cobbler; resoling and polishing what you have outperforms buying cheap replacements every time.</p>
+      </div>
+    </div>
+
+    <!-- PAGE 7: JEWELRY -->
+    <div class="page" id="p6">
+      <p class="chapter-label">Chapter 06</p>
+      <h2 class="page-heading">Jewelry & Accessories</h2>
+      <p class="page-subheading">One thing at a time, chosen correctly.</p>
+
+      <div class="g3" style="margin-bottom:13px;">
+        <div class="piece"><div class="pdot" style="background:#F5F0E8;border:0.5px solid #ddd;"></div><p class="piece-name">Pearl strand</p><p class="piece-detail">Single strand, close to the neck. Freshwater pearls are indistinguishable from real at a fraction of the cost. 7–8mm.</p><p class="piece-where">Mikimoto · freshwater on Etsy ($40–80)</p></div>
+        <div class="piece"><div class="pdot" style="background:#FDF8EE;"></div><p class="piece-name">Gold stud earrings</p><p class="piece-detail">Small, always in. Plain dome, small pearl, or simple knot. 14k only — plated wears off and reads immediately.</p><p class="piece-where">Catbird · Mejuri · vintage</p></div>
+        <div class="piece"><div class="pdot" style="background:#D4AF60;"></div><p class="piece-name">The watch</p><p class="piece-detail">Small square face, solid 14k gold case, cognac leather strap. Vintage Longines, Omega, or Gruen from the 1950s–70s. $150–400 on eBay or Etsy.</p><p class="piece-where">eBay · Etsy · Chrono24</p></div>
+      </div>
+
+      <div class="g2" style="margin-bottom:13px;">
+        <div class="piece"><div class="pdot" style="background:#FDF8EE;"></div><p class="piece-name">Simple gold chain</p><p class="piece-detail">Thin, delicate, worn alone. The casual alternative to pearls.</p><p class="piece-where">Mejuri · Catbird · Ariel Gordon</p></div>
+        <div class="piece" style="background: var(--cream); border-color: var(--border);"><div class="pdot" style="background:linear-gradient(135deg,#c41230,#003399,#c8b89a);border:none;"></div><p class="piece-name">The Gucci scarf</p><p class="piece-detail">Already acquired — the crown jewel. Tied loosely to the bag handle. The more unconsidered it looks, the better it reads.</p><p class="piece-where">Already acquired ✓</p></div>
+      </div>
+
+      <div class="card-warm">
+        <div class="rule"><span class="rn">01</span><span class="rt">Gold only, always. <span class="rs">The warm palette only coheres with gold.</span></span></div>
+        <div class="rule"><span class="rn">02</span><span class="rt">One focal point per outfit — pearls or earrings, not both. <span class="rs">Restraint signals confidence.</span></span></div>
+        <div class="rule"><span class="rn">03</span><span class="rt">Real over plated, vintage over new. <span class="rs">Age and honesty over newness.</span></span></div>
+      </div>
+    </div>
+
+    <!-- PAGE 8: BAGS -->
+    <div class="page" id="p7">
+      <p class="chapter-label">Chapter 07</p>
+      <h2 class="page-heading">The Bag</h2>
+      <p class="page-subheading">Structured, simple, leather, quietly correct. No logomania.</p>
+
+      <div class="g3" style="margin-bottom:13px;">
+        <div class="piece"><span class="badge b1">start here</span><p class="piece-name">Top handle structured bag</p><div class="cdots"><div class="cdot" style="background:#3D3028;"></div><div class="cdot" style="background:#1a1a1a;"></div><div class="cdot" style="background:#8B1A1A;"></div></div><p class="piece-detail">The primary bag. Carried in the crook of the arm — never on the shoulder as the main carry. Medium sized. The most Selina object in the bag category.</p><p class="piece-where">Polène · Strathberry · A.P.C. · The RealReal</p></div>
+        <div class="piece"><span class="badge b1">start here</span><p class="piece-name">Simple leather tote</p><div class="cdots"><div class="cdot" style="background:#3D3028;"></div><div class="cdot" style="background:#1a1a1a;"></div></div><p class="piece-detail">For days when you're carrying more. Leather, unstructured but not floppy. The Gucci scarf on the handle transforms it — the bag is the backdrop, the scarf is the story.</p><p class="piece-where">Cuyana · Madewell · Banana Republic leather</p></div>
+        <div class="piece"><span class="badge b2">add later</span><p class="piece-name">Small evening clutch</p><div class="cdots"><div class="cdot" style="background:#1a1a1a;"></div><div class="cdot" style="background:#3D3028;"></div></div><p class="piece-detail">For dinners only. Simple envelope or box shape. Phone, card, lipstick — nothing else. The constraint is the point. Vintage is the best option.</p><p class="piece-where">Vintage shops · eBay · The RealReal</p></div>
+      </div>
+
+      <div class="invest" style="margin-bottom:13px;">
+        <div class="invest-hdr"><h3>The investment bag — when the time comes</h3><p>One great bag on resale. Not urgent, but worth knowing the landscape.</p></div>
+        <div class="invest-body">
+          <div class="ic"><p class="ic-name">Hermès Kelly</p><p class="ic-detail">The apex. Structured, top handle, correct in every room. Cognac or black. Resale only — this is a years-long search, not a purchase.</p></div>
+          <div class="ic"><p class="ic-name">Old Celine (Philo era)</p><p class="ic-detail">More accessible than Hermès, equally correct. Minimal, no logomania. Comes up on Vestiaire regularly at $800–1500.</p></div>
+          <div class="ic"><p class="ic-name">Chanel Classic Flap</p><p class="ic-detail">Medium only, never jumbo. Black or burgundy. The quilting is enough detail — no additional hardware needed.</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="label">Polène — the most important brand you may not know</p>
+        <p class="val">French, impeccable leather, structured shapes, no logos, $300–500. For a top handle bag before you're ready for investment tier, this is the answer. The Numéro Un in cognac is the specific recommendation.</p>
+        <div class="divider"></div>
+        <p class="label">avoid</p>
+        <p class="val">Visible logos as primary design element. Crossbody as your main bag. Backpacks — always.</p>
+      </div>
+    </div>
+
+    <!-- PAGE 9: SUMMER EDIT -->
+    <div class="page" id="p8">
+      <p class="chapter-label">Chapter 08</p>
+      <h2 class="page-heading">The Summer Edit</h2>
+      <p class="page-subheading">Linen replaces wool. Cream and white come forward. The silhouette stays the same.</p>
+
+      <div class="palette" style="margin-bottom:13px;">
+        <div class="sw" style="background:#F5F0E8;"><span class="sw-name" style="color:#8A7D6B;">cream</span><span class="sw-role" style="color:#9A8D7B;">forward</span></div>
+        <div class="sw" style="background:#FAFAF7;border:0.5px solid #eee;"><span class="sw-name" style="color:#8A8A80;">white</span><span class="sw-role" style="color:#AAAAAA;">linen</span></div>
+        <div class="sw" style="background:#C8B89A;"><span class="sw-name" style="color:#4A3C2C;">camel</span><span class="sw-role" style="color:#6A5848;">still present</span></div>
+        <div class="sw" style="background:#B8C4C0;"><span class="sw-name" style="color:#3A4A48;">pale blue</span><span class="sw-role" style="color:#5A6A68;">linen shirt</span></div>
+        <div class="sw" style="background:#1B2A4A;"><span class="sw-name" style="color:#8AAAC8;">navy</span><span class="sw-role" style="color:#6A88A8;">recedes</span></div>
+        <div class="sw" style="background:#3D3028;"><span class="sw-name" style="color:#B09880;">cognac</span><span class="sw-role" style="color:#907860;">leather still</span></div>
+      </div>
+
+      <div class="g3" style="margin-bottom:13px;">
+        <div class="piece"><div class="pdot" style="background:#F5F0E8;border:0.5px solid #ddd;"></div><p class="piece-name">Linen trousers</p><p class="piece-detail">Wide leg still, high waist still. Cream, white, or very light camel. The silhouette doesn't change — just the fabric and the color. These are the summer equivalent of the wool trousers doing the exact same job.</p><p class="piece-where">Toteme · Sézane · & Other Stories</p></div>
+        <div class="piece"><div class="pdot" style="background:#FAFAF7;border:0.5px solid #ddd;"></div><p class="piece-name">Linen shirt</p><p class="piece-detail">White or pale blue, worn slightly open and loosely tucked. This is the one moment the aesthetic relaxes its collar a little. Still structured, still correct — just breathing.</p><p class="piece-where">Toteme · Sézane · Equipment</p></div>
+        <div class="piece"><div class="pdot" style="background:#F5F0E8;border:0.5px solid #ddd;"></div><p class="piece-name">Cotton or linen blazer</p><p class="piece-detail">Cream or pale navy. Unlined, unstructured compared to the winter blazer — but still a blazer, still correct. The summer version of the same cornerstone piece. It breathes.</p><p class="piece-where">J.Crew · Ralph Lauren · Toteme</p></div>
+        <div class="piece"><div class="pdot" style="background:#FAFAF7;border:0.5px solid #ddd;"></div><p class="piece-name">Linen sheath dress</p><p class="piece-detail">White, cream, or pale stripe. The summer equivalent of the winter sheath. Worn with flat cognac sandals rather than loafers. Midi length still correct for your height.</p><p class="piece-where">Sézane · Reformation · & Other Stories</p></div>
+        <div class="piece"><div class="pdot" style="background:#C8B89A;"></div><p class="piece-name">Flat leather sandal</p><p class="piece-detail">The one summer shoe addition. Simple, minimal, tan or cognac leather. Not a gladiator, nothing with hardware. Coastal without being beachy.</p><p class="piece-where">K Jacques · Tkees · Ancient Greek Sandals</p></div>
+        <div class="piece"><div class="pdot" style="background:#F5F0E8;border:0.5px solid #ddd;"></div><p class="piece-name">Cream silk blouse</p><p class="piece-detail">Already in the wardrobe — and the summer workhorse. Works year-round because silk is already a warm-weather fabric. This piece doesn't change between seasons.</p><p class="piece-where">Already in wardrobe ✓</p></div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <p class="label">the summer logic</p>
+          <p class="val">Linen instead of wool. Cream and white forward instead of navy and burgundy. Flat sandals instead of boots. Same palette family, same silhouette, different weight. The summer version is slightly more forgiving — the warmth does some of the work and the fabrics are lighter.</p>
+          <div class="divider"></div>
+          <p class="label">what doesn't change</p>
+          <p class="val">The wide-leg high-waist silhouette. Cognac as the leather color. The blazer as the layering piece. The cream blouse as the foundation. The bones are identical — only the fabric and the color temperature shift.</p>
+        </div>
+        <div class="card">
+          <p class="label">nantucket in summer</p>
+          <p class="val">Linen trousers, a cream linen shirt slightly open at the collar, flat cognac sandals, the scarf on the bag. This is the exact outfit. Simple gold studs. Nothing heavy.</p>
+          <div class="divider"></div>
+          <p class="label">sf in summer</p>
+          <p class="val">SF doesn't really have a Nantucket summer — you know this. But the linen pieces translate perfectly to the warmer days you do get, and to any travel somewhere actually warm. The wardrobe is fully functional in both climates.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 10: WEEKEND -->
+    <div class="page" id="p9">
+      <p class="chapter-label">Chapter 09</p>
+      <h2 class="page-heading">The Weekend</h2>
+      <p class="page-subheading">Nantucket vs Martha's Vineyard — and the SF equivalent.</p>
+
+      <div class="g2" style="margin-bottom:13px;">
+        <div class="isl ack"><p class="isl-title">Nantucket</p><p class="isl-sub">The preppy one. Buttoned up, whaling money, grey shingles. Old WASP aristocracy. The uniform is non-negotiable.</p></div>
+        <div class="isl mv"><p class="isl-title">Martha's Vineyard</p><p class="isl-sub">The liberal one. More relaxed, more diverse, more artistic. Obama summers here. That tells you a lot.</p></div>
+      </div>
+
+      <div class="vs" style="margin-bottom:13px;">
+        <div class="vs-col">
+          <p class="vs-title">Nantucket Saturday</p>
+          <div class="vs-item">Morning walk for pastries in town</div>
+          <div class="vs-item">Sailing or Surfside beach</div>
+          <div class="vs-item">Lunch at The Boarding House</div>
+          <div class="vs-item">Porch, gin and tonics, the same people</div>
+          <div class="vs-item">Evening bonfire</div>
+        </div>
+        <div class="vs-col">
+          <p class="vs-title">Vineyard Saturday</p>
+          <div class="vs-item">Farmers market, West Tisbury</div>
+          <div class="vs-item">Lucy Vincent Beach (if you know someone)</div>
+          <div class="vs-item">Lobster shack lunch</div>
+          <div class="vs-item">Antiquing in Vineyard Haven</div>
+          <div class="vs-item">Dinner at a friend's house</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:13px;">
+        <p class="label">which is more Selina</p>
+        <div class="quote">"Nantucket, no question. The formality, the codes, the yacht club politics. She'd find the Vineyard a little too casual, a little too earnest. Though she'd go to a Vineyard dinner if the guest list was right."</div>
+        <div class="divider"></div>
+        <p class="label">the key distinction</p>
+        <p class="val">Neither island is really about activities. The point is the accumulation of small rituals — the same bakery, the same beach, the same porch, the same people. The leisure is unhurried and slightly repetitive. That's the flex: you don't need to be entertained, you just need to be there.</p>
+      </div>
+
+      <div class="card">
+        <p class="label">the SF weekend equivalent</p>
+        <p class="val">The Nantucket feeling — a contained place with water, wind, a walkable town, and an unhurried afternoon — translates best to Tiburon via the Ferry Building ferry. That crossing ritual matters. Sam's Anchor Café on a sunny Saturday is as close as it gets. For the quieter, more serious version: Inverness and Point Reyes. Oysters at Hog Island, a walk at Limantour, lunch at the Station House. Less social, more restorative — the Point Reyes version maps more to the Connecticut or Maine energy.</p>
+      </div>
+    </div>
+
+  </div><!-- end .pages -->
+
+  <div class="nav">
+    <button class="nav-btn" id="prev-btn" onclick="changePage(-1)" disabled>← Prev</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav-btn" id="next-btn" onclick="changePage(1)">Next →</button>
+  </div>
+
+</div>
+
+<script>
+  const N = 10;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < N; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  }
+  function goTo(n) {
+    document.getElementById('p' + cur).classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(n, N - 1));
+    document.getElementById('p' + cur).classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    document.getElementById('counter').textContent = (cur + 1) + ' / ' + N;
+    document.getElementById('prev-btn').disabled = cur === 0;
+    document.getElementById('next-btn').disabled = cur === N - 1;
+    document.getElementById('p' + cur).scrollTop = 0;
+  }
+  function changePage(d) { goTo(cur + d); }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changePage(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changePage(-1);
+  });
+</script>
+</body>
+</html>
